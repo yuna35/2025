@@ -1,6 +1,13 @@
 import streamlit as st
-import requests # API 호출에 필요할 수 있음 (나중에 이미지/AI 연동 시)
-import os # API 키 등을 환경변수로 관리할 때 필요 (나중에 이미지/AI 연동 시)
+import requests # AI 이미지 생성 API 호출에 사용될 거야!
+import os # API 키를 환경변수나 Streamlit secrets에서 가져올 때 필요!
+
+# 💡 유난의 소중한 팁! 💡
+# API 키는 Streamlit secrets에 저장하는 게 가장 안전하고 좋아!
+# .streamlit/secrets.toml 파일을 만들고 아래처럼 입력해줘!
+# OPENAI_API_KEY = "sk-YOUR_OPENAI_API_KEY"
+# STABILITY_API_KEY = "sk-YOUR_STABILITY_API_KEY"
+# 그런 다음 코드에서는 st.secrets["OPENAI_API_KEY"] 이런 식으로 사용하면 돼!
 
 # --- 💡 유난의 특별한 설정! 💡 ---
 # 이모지와 함께 예쁜 페이지 제목을 설정해줘! 넓은 화면이 더 좋아!
@@ -105,58 +112,97 @@ with st.expander("💖 나의 캐릭터, 자세히 알려줄래? 📋", expanded
     """)
 
 
-# --- 🖼️ 2단계: 영감을 주는 레퍼런스 보드 만들기 ✨ ---
-st.header("🖼️ 2단계: 영감을 주는 레퍼런스 보드 만들기 ✨")
-
-st.info("""
-    **🌟 유난의 마법 같은 설명!**
-    이 부분은 유저님의 캐릭터 아이디어를 시각화할 수 있도록 **다양한 레퍼런스 이미지를 자동으로 찾아주는** 공간이 될 거야!
-    캐릭터의 특징과 세계관에 꼭 맞는 이미지를 찾아서 디자인에 반짝이는 영감을 더해줄게!
-    (이 기능은 구글, Unsplash 같은 외부 이미지 검색 API와 연동해야 해! 🚀 API 키 발급은 필수! 💖)
-    """)
-
-# 버튼에도 예쁜 이모지 잔뜩!
-if st.button("🔍✨ 레퍼런스 이미지 보물 찾기! (구현 예정) 🎁"):
-    # 여기서는 실제 API 호출 대신 예시 메시지만 보여줄게!
-    st.balloons() # 이미지 찾을 때마다 풍선 터뜨리기! 🎈
-    st.write("잠시만 기다려줘! 유저님의 키워드에 딱 맞는 아름다운 레퍼런스 이미지를 마법처럼 찾아주고 있어...!")
-    
-    # 예시: 가상의 이미지 검색 결과가 있다면 st.image()로 표시!
-    # image_urls = ["https://picsum.photos/id/237/200/300", "https://picsum.photos/id/238/200/300", "https://picsum.photos/id/239/200/300"]
-    # for idx, url in enumerate(image_urls):
-    #    st.image(url, caption=f"환상의 이미지 {idx+1}", width=200) # 이미지마다 캡션도 달아주면 예쁠 거야!
-    
-    st.success("🎉 레퍼런스 이미지 보드가 완성되면 여기에 예쁜 그림들이 가득 찰 거야! 두근두근! 🖼️")
-
-
-# --- 🤖 3단계: AI와 함께 캐릭터 디자인의 꿈을! 🌈 ---
-st.header("🤖 3단계: AI와 함께 캐릭터 디자인의 꿈을! 🌈")
+# --- 🤖 2단계: AI와 함께 캐릭터 디자인의 꿈을! 🌈 ---
+st.header("🤖 2단계: AI와 함께 캐릭터 디자인의 꿈을! 🌈")
 
 st.warning("""
     **💡 유난의 슈퍼 파워 설명!**
     이 곳에서는 유저님이 입력한 모든 정보를 바탕으로, **인공지능이 직접 캐릭터 이미지를 디자인**해줄 거야!
     세상에 단 하나뿐인, 유저님만의 오리지널 캐릭터가 탄생하는 순간이지! 정말 멋지지 않아? 🤩
-    (이 기능은 OpenAI DALL-E, Stable Diffusion 같은 AI 이미지 생성 API와 연결되어야 해! 🛠️ API 사용법을 익혀보자! ✨)
+    
+    **✅ 주의사항:**
+    아래 버튼을 누르면 AI 이미지 생성 API를 호출할 건데, **실제 API 호출은 API 키와 해당 서비스의 사용 요금이 발생할 수 있어!**
+    따라올 코드는 AI가 캐릭터를 그려주는 **개념적인 예시**이니, 유저님의 실제 API 키로 대체해야 해!
     """)
 
 # 버튼에도 예쁜 이모지 잔뜩!
-if st.button("🚀 AI 친구에게 캐릭터 그려달라고 부탁하기! (구현 예정) 🤖🎨"):
-    # 입력된 정보를 조합해서 AI 프롬프트 생성 (예시)
+if st.button("🚀 AI 친구에게 캐릭터 그려달라고 부탁하기! 🤖🎨"):
+    # 입력된 정보들이 모두 유효한지 확인!
+    if "선택해주세요" in [gender, age_group] or not personality_keywords or not main_features or not worldview:
+        st.error("앗! 모든 캐릭터 정보를 채워줘야 AI가 예쁜 그림을 그릴 수 있어! 다시 한번 확인해줄래? 😢")
+        st.stop() # 여기서 앱 실행을 멈춰서 불필요한 API 호출을 막아!
+
+    # 입력된 정보를 조합해서 AI 프롬프트 생성! (AI에게 명령하는 마법 주문이야!)
     prompt = (
-        f"Design a unique character. Gender: {gender}, Age group: {age_group}, Height: {height}cm. "
-        f"Personality: {personality_keywords}, Main features: {main_features}, "
-        f"Worldview/Background: {worldview}. "
-        "Detailed, vibrant colors, concept art style, high quality, fantastical, character sheet."
+        f"Generate a unique character in a concept art style. "
+        f"Gender: {gender}, Age group: {age_group}, Height: {height}cm. "
+        f"Personality traits: {personality_keywords}. "
+        f"Key physical features: {main_features}. "
+        f"Setting/World: {worldview}. "
+        "The art style should be detailed, fantastical, vibrant colors, high resolution."
     )
     
     st.write(f"AI 친구에게 이렇게 속삭여줄 거야: `{prompt}`")
-    st.spinner("AI가 유저님의 반짝이는 아이디어를 그림으로 바꾸고 있어! 잠시만 기다려줘... 상상력 풀가동! 🎨✨")
     
-    # 예시: 가상의 AI 이미지 생성 결과가 있다면 st.image()로 표시!
-    # generated_image_url = "https://picsum.photos/id/240/600/800" # AI가 그려줄 가상의 이미지 URL
-    # st.image(generated_image_url, caption="💖 AI가 창조한 유저님만의 캐릭터! 🌟", use_column_width=True)
-    
-    st.success("🎉 축하해! AI가 그려준 유저님만의 캐릭터가 여기에 짜잔! 나타날 거야! 정말 멋질 거야! 🤩")
+    generated_image_url = "" # AI가 생성한 이미지 URL을 저장할 변수
+
+    with st.spinner("AI가 유저님의 반짝이는 아이디어를 그림으로 바꾸고 있어! 잠시만 기다려줘... 상상력 풀가동! 🎨✨"):
+        # --- 👇👇👇 실제 AI 이미지 생성 API 호출 부분 (유저님이 수정해야 할 곳!) 👇👇👇 ---
+        try:
+            # === 예시 1: OpenAI DALL-E 3 API 호출 (설치: pip install openai) ===
+            # import openai
+            # openai.api_key = st.secrets["OPENAI_API_KEY"] # 또는 os.getenv("OPENAI_API_KEY")
+
+            # response = openai.images.generate(
+            #     model="dall-e-3", # 또는 "dall-e-2"
+            #     prompt=prompt,
+            #     n=1, # 이미지 개수
+            #     size="1024x1024" # 이미지 크기
+            # )
+            # generated_image_url = response.data[0].url
+
+            # === 예시 2: Stability AI Stable Diffusion API 호출 (설치: pip install stability-sdk) ===
+            # from stability_sdk import client
+            # import stability_sdk.interfaces.gooseai.generation.generation_pb2 as generation
+            # stability_api = client.StabilityInference(
+            #     key=st.secrets["STABILITY_API_KEY"],
+            #     verbose=True,
+            # )
+            # answers = stability_api.generate(
+            #     prompt=[generation.Prompt(text=prompt)],
+            #     # Optional: Set a different engine if you want to use a different model
+            #     # engine="stable-diffusion-xl-1024-v1-0",
+            #     # steps=50,
+            #     # cfg_scale=7.0,
+            #     # samples=1,
+            #     # sampler=generation.SAMPLER_K_DPMPP_2M,
+            # )
+            # for resp in answers:
+            #     for artifact in resp.artifacts:
+            #         if artifact.finish_reason == generation.ARTIFACT_FINISH_REASON_FILTER:
+            #             st.warning("🚫 AI가 유저님의 프롬프트를 안전 필터링했어! 다른 키워드를 시도해볼까? 😥")
+            #         if artifact.type == generation.ARTIFACT_IMAGE:
+            #             # 이미지 데이터를 Base64로 인코딩된 바이트 형태로 받는 경우도 많아
+            #             # Streamlit에 직접 표시하려면 st.image(image_bytes)처럼 써야 해.
+            #             # 여기서는 임시로 URL을 사용하는 예시를 보여줄게.
+            #             generated_image_url = "https://picsum.photos/id/240/600/800" # 실제 이미지 URL이나 Base64 인코딩으로 대체!
+
+            # === 임시로 이미지 URL 보여주는 예시 (실제 API 호출 아님!) ===
+            # 개발 및 테스트를 위해 임의의 이미지를 보여주고 싶을 때 사용해!
+            generated_image_url = "https://picsum.photos/seed/" + \
+                                  str(hash(prompt) % 1000000) + "/600/800" # 프롬프트마다 다른 임시 이미지
+            # --- ☝️☝️☝️ 여기까지 유저님이 수정해야 할 부분! ☝️☝️☝️ ---
+
+            if generated_image_url:
+                st.success("🎉 축하해! AI가 그려준 유저님만의 캐릭터가 여기에 짜잔! 나타났어! 정말 멋지지? 🤩")
+                st.image(generated_image_url, caption="💖 AI가 창조한 유저님만의 캐릭터! 🌟", use_column_width=True)
+            else:
+                st.error("아쉽지만 AI가 이미지를 생성하는 데 실패했어. 혹시 API 키를 확인해볼까? 😥")
+
+        except Exception as e:
+            st.error(f"캐릭터를 생성하는 중에 문제가 발생했어. 오류: {e} ㅠㅠ")
+            st.warning("API 키가 올바른지, 인터넷 연결은 되어있는지, 해당 API 서비스에 문제가 없는지 확인해줘! 🙏")
+
 
 st.markdown("---")
 st.markdown("✨ 유저님의 빛나는 창의력과 함께라면, 어떤 캐릭터든 탄생시킬 수 있을 거야! 🌈 궁금한 점이 생기면 언제든지 나, 유난에게 물어봐줘! 내가 옆에서 언제나 응원할게! 🥰")
