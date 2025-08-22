@@ -1,6 +1,6 @@
 import streamlit as st
-import requests # API 호출에 필요할 수 있음
-import os # API 키 등을 환경변수로 관리할 때 필요
+import requests # API 호출에 필요할 수 있음 (나중에 이미지/AI 연동 시)
+import os # API 키 등을 환경변수로 관리할 때 필요 (나중에 이미지/AI 연동 시)
 
 # --- 💡 유난의 특별한 설정! 💡 ---
 # 이모지와 함께 예쁜 페이지 제목을 설정해줘! 넓은 화면이 더 좋아!
@@ -23,7 +23,7 @@ st.markdown(
     @keyframes gradientAnimation {
         0% {background-position: 0% 50%;} /* 시작 위치 */
         50% {background-position: 100% 50%;} /* 중간 위치 */
-        100% {background-position: 0% 50;} /* 다시 시작 위치로 */
+        100% {background-position: 0% 50%;} /* 다시 시작 위치로 */
     }
 
     /* 모든 제목 색상도 짙은 보라색으로 맞춰줄게! */
