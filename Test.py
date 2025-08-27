@@ -1,7 +1,20 @@
 import streamlit as st
 
-# 페이지 설정은 살짝 넓게 가는 게 보기에 편하더라! 🥰
-st.set_page_config(layout="wide") 
+# 페이지 설정은 넓게! 그리고 이제 테마를 파스텔 톤으로 예쁘게 바꿔줄 시간! 💖
+st.set_page_config(
+    layout="wide",
+    page_title="성격 맞춤 색깔 추천기",
+    page_icon="🌈", # 탭에 보여질 아이콘도 추가해보자!
+    initial_sidebar_state="expanded", # 사이드바 초기 상태
+    # ✨ 파스텔 톤 테마 설정 시작! ✨
+    theme={
+        "primaryColor": "#CCADED",        # 메인 색상 (버튼 등): 부드러운 라벤더 퍼플 💜
+        "backgroundColor": "#F0F8FF",     # 페이지 배경색: 아주 연한 하늘색 (앨리스 블루) ☁️
+        "secondaryBackgroundColor": "#E0F2F7", # 보조 배경색 (사이드바 등): 살짝 더 진한 연한 하늘색 💙
+        "textColor": "#26272E",           # 글자색: 너무 밝지 않은 진회색 (읽기 좋게!) 🖋️
+        "font": "sans serif"              # 폰트 스타일: 깔끔한 산세리프 폰트
+    }
+) 
 
 # 웹앱의 제목을 예쁘게 달아줘 보자! 💖
 st.title('🎨 성격 맞춤 색깔 추천기 ✨')
